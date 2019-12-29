@@ -43,4 +43,12 @@ public class TestBase {
             e.printStackTrace();
         }
     }
+    public void waitUntilAllElementsAreVisible(By locator, int time) {
+        try {
+            new WebDriverWait(driver,time).until(ExpectedConditions
+                    .visibilityOfAllElementsLocatedBy(locator));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

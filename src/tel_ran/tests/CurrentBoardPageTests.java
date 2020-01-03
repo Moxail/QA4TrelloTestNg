@@ -77,6 +77,40 @@ public class CurrentBoardPageTests extends TestBase{
         Assert.assertEquals(driver.findElement(By.cssSelector("span.placeholder")).getText(),"Add another list");
 
     }
+    @Test
+     public void deleteList(){
+        //----Open 'QA 4 Auto' board
+        waitUntilElementIsVisible(By.xpath("//div[@title='QA4 Auto']/.."),20);
+        driver.findElement(By.xpath("//div[@title='QA4 Auto']/..")).click();
+        waitUntilElementIsClickable(By.cssSelector(".placeholder"),30);
+        WebElement addButton = driver.findElement(By.cssSelector(".placeholder"));
+        int quantityListBegining;
+        if (addButton.getText().equals("Add a list")){
+            addButton.click();
+            waitUntilElementIsClickable(By.xpath("//input[@name = 'name']"),5);
+            driver.findElement(By.xpath("//input[@name = 'name']")).sendKeys("New List");
+            driver.findElement(By.xpath("//input[@type = 'submit']")).click();
+            waitUntilElementIsClickable(By.xpath("//a[@class='icon-lg icon-close dark-hover js-cancel-edit']"),5);
+            driver.findElement(By.xpath("//a[@class='icon-lg icon-close dark-hover js-cancel-edit']")).click();
+            quantityListBegining=1;
+        }
+        else {
+            waitUntilElementIsClickable(By.cssSelector(".js-open-list-menu"),10);
+            quantityListBegining = driver.findElements(By.cssSelector(".js-open-list-menu")).size();
+
+        }
+
+        //---- delete list----------------
+        waitUntilElementIsClickable(By.cssSelector(".js-open-list-menu"),10);
+        driver.findElement(By.cssSelector(".js-open-list-menu")).click();
+        waitUntilElementIsClickable(By.cssSelector(".js-close-list"),10);
+        driver.findElement(By.cssSelector(".js-close-list")).click();
+        int quantityListEnd = driver.findElements(By.cssSelector(".js-open-list-menu")).size();
+
+        Assert.assertEquals(quantityListBegining,quantityListEnd+1, "quantityListBegining is not quantityListEnd+1");
+
+
+    }
 
     @Test
     public void addFirstCardInNewList()  {

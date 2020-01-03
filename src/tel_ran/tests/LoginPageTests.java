@@ -77,7 +77,34 @@ public class LoginPageTests extends TestBase{
 
         Assert.assertTrue(driver.findElement(By
                 .xpath("//div[@id = 'login-error']/span")).getText()
-                .contains("Incorrect email address and / or password."));
+                .contains("Incorrect email address and / or password."),"Error message is not correct");
+
+    }
+    @Test
+    public void loginIncorrectLoginNegative(){
+        WebElement loginIcon = driver.findElement(By
+                .xpath("//a[@class='btn btn-sm btn-link text-white']"));
+        loginIcon.click();
+        //----- go to login page -------
+        waitUntilElementIsClickable(By.xpath("//input[@id='login']"),30);
+        WebElement loginField = driver.findElement(By.xpath("//input[@type='email']"));
+        loginField.click();
+        loginField.clear();
+        loginField.sendKeys("klmn");
+        WebElement passwordField = driver.findElement(By.id("password"));
+        passwordField.click();
+        passwordField.clear();
+        passwordField.sendKeys("hjdhj");
+        driver.findElement(By.id("login")).click();
+        // ----- wait error message -----
+        waitUntilElementIsVisible(By.xpath("//p[@class = 'error-message']"),20);
+        System.out.println("Error text: " + driver
+                .findElement(By.xpath("//p[@class = 'error-message']")).getText());
+        Assert.assertEquals(driver.findElement(By.xpath("//p[@class = 'error-message']"))
+                .getText(), "Invalid password","'Invalid password' message is not displayed");
+
+
+
 
     }
 

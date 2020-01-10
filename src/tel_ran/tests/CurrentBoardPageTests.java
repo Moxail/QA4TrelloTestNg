@@ -8,6 +8,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import tel_ran.helpers.BoardsPageHelper;
+import tel_ran.helpers.CurrentBoardPageHelper;
 import tel_ran.helpers.HomePageHelper;
 import tel_ran.helpers.LoginPageHelper;
 
@@ -18,12 +19,15 @@ public class CurrentBoardPageTests extends TestBase{
     HomePageHelper homePage;
     LoginPageHelper loginPage;
     BoardsPageHelper boardsPage;
+    CurrentBoardPageHelper qa4AutoBoard;
 
     @BeforeMethod
     public void initTest(){
         homePage = new HomePageHelper(driver);
         loginPage = new LoginPageHelper(driver);
         boardsPage = new BoardsPageHelper(driver);
+        qa4AutoBoard = new CurrentBoardPageHelper(driver, "QA4 Auto");
+
         homePage.openLoginPage();
         loginPage.waitUntilPageIsLoaded();
         loginPage.loginToTrelloAsAtlassian(LOGIN,PASSWORD);
@@ -31,43 +35,31 @@ public class CurrentBoardPageTests extends TestBase{
     }
 
     @Test
-    public void createNewList()  {
+    public void verifyIfLoadedBoardIsCorrect()  {
 
         //----Open 'QA 4 Auto' board
-        waitUntilElementIsVisible(By.xpath("//div[@title='QA4 Auto']/.."),20);
-        driver.findElement(By.xpath("//div[@title='QA4 Auto']/..")).click();
-        //Thread.sleep(15000);
-        waitUntilElementIsClickable(By.cssSelector(".placeholder"),30);
-        //-----Add a new list------
-        WebElement addListButton = driver.findElement(By.cssSelector(".placeholder"));
-        String nameAddListButton = addListButton.getText();
-        addListButton.click();
-        waitUntilElementIsVisible(By.cssSelector(".list-name-input"),10);
-        String str = genRandomString(7);
-        //System.out.println("Name button - " + nameAddListButton);
-        int quantityListAtFirst = driver.findElements(By.xpath("//h2")).size();
-        if(nameAddListButton.equals("Add another list")){
-            boolean exitName = false;
-            //System.out.println("Size-" + driver.findElements(By.xpath("//h2/../textarea")).size());
-            for(WebElement element: driver.findElements(By.xpath("//h2/../textarea"))){
-                //System.out.println("Name - " + element.getText());
-                if(element.getText().equals(str)) exitName = true;
-            }
-            if(exitName) str = stringWithRandomNumber(1000,str);
+        boardsPage.openBoard("QA4 Auto");
+        qa4AutoBoard.waitUntilPageIsLoaded();
+        Assert.assertTrue(qa4AutoBoard.titleVerification());
+    }
+
+    @Test
+    public void createNewList()  {
+        boardsPage.openBoard("QA4 Auto");
+        qa4AutoBoard.waitUntilPageIsLoaded();
+        String nameList = "New List";
+        if (qa4AutoBoard.getAddButtonName().equals("Add another list")){
+            nameList = qa4AutoBoard.genRandomString(7);
+            if(qa4AutoBoard.existsList(nameList))
+                nameList = qa4AutoBoard.stringWithRandomNumber(1000,
+                        nameList);
         }
-
-        driver.findElement(By.cssSelector(".list-name-input"))
-                .sendKeys(str);
-        driver.findElement(By.xpath("//input[@type='submit']")).click();
-
-        waitUntilElementIsClickable(By.cssSelector("a.js-cancel-edit"),10);
-        driver.findElement(By.cssSelector("a.js-cancel-edit")).click();
-        waitUntilElementIsVisible(By.cssSelector("span.placeholder"),10);
-        int quantityListAtTheEnd = driver
-                .findElements(By.xpath("//h2")).size();
+        int quantityListAtFirst = qa4AutoBoard.getQuantityLists();
+        qa4AutoBoard.createNewList(nameList);
+        int quantityListAtTheEnd = qa4AutoBoard.getQuantityLists();
         Assert.assertEquals(quantityListAtFirst+1,quantityListAtTheEnd);
-        Assert.assertEquals(driver.findElement(By.cssSelector("span.placeholder")).getText(),"Add another list");
-
+        Assert.assertEquals(qa4AutoBoard.getAddButtonName(),
+                "Add another list");
     }
     @Test
      public void deleteList(){
@@ -151,23 +143,8 @@ public class CurrentBoardPageTests extends TestBase{
 
         Assert.assertEquals(quantityAddAnotherButtonBeg+1, quantityAddAnotherButtonEnd);
 
-
     }
 
-    public static String genRandomString(int num){
-        String str = "";
-        int number;
-        Random gen = new Random();
-        for(int i=0; i<num; i++){
-            number = '!' + gen.nextInt('z' - '!' +1);
-            str = str + (char)number;
-        }
-        return str;
-    }
 
-    public static String stringWithRandomNumber(int num,String str){
-        Random gen = new Random();
-        return str + gen.nextInt(num);
-    }
 
 }

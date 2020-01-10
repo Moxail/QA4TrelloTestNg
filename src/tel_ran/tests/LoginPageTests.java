@@ -4,6 +4,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
@@ -21,8 +22,8 @@ public class LoginPageTests extends TestBase{
 
     @BeforeMethod
     public void initTests(){
-      homePage = new HomePageHelper(driver);
-      loginPage = new LoginPageHelper(driver);
+      homePage = PageFactory.initElements(driver,HomePageHelper.class);
+      loginPage = PageFactory.initElements(driver,LoginPageHelper.class);
       boardsPage = new BoardsPageHelper(driver);
     }
 
